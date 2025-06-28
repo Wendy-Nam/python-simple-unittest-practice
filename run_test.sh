@@ -1,34 +1,44 @@
 #!/bin/bash
 
-echo "🧪 학생 정보 관리 프로그램 자동 테스트 시작"
+# Automated test script for the Student Information Management Program
+# This script checks for required packages and runs the test suite
+
+echo "🧪 Starting automated tests for Student Information Management Program"
 echo "=============================="
 
+# Check if requirements.txt exists and install packages from it
 if [ -f requirements.txt ]; then
-  echo "🔍 requirements.txt 발견, 필요한 패키지 설치 시도..."
+  echo "🔍 Found requirements.txt, attempting to install required packages..."
   pip3 install -r requirements.txt
   if [ $? -ne 0 ]; then
-    echo "❌ requirements.txt 기반 패키지 설치 실패! pip 환경을 확인하세요."
+    echo "❌ Failed to install packages from requirements.txt! Please check your pip environment."
     exit 1
   fi
 else
-  REQUIRED_PKGS=("tabulate" "rich" "pandas")
+  # Fallback: manually check and install required packages if requirements.txt doesn't exist
+  REQUIRED_PKGS=("tabulate" "rich" "pandas" "openpyxl")
   for pkg in "${REQUIRED_PKGS[@]}"; do
+    # Try to import the package to check if it's installed
     python3 -c "import $pkg" 2>/dev/null
     if [ $? -ne 0 ]; then
-      echo "🔧 $pkg 패키지가 없어 자동 설치합니다..."
+      echo "🔧 Package $pkg not found, installing automatically..."
       pip3 install $pkg
       if [ $? -ne 0 ]; then
-        echo "❌ $pkg 설치 실패! pip 환경을 확인하세요."
+        echo "❌ Failed to install $pkg! Please check your pip environment."
         exit 1
       fi
     fi
   done
 fi
 
+# Run the test suite
+echo "🚀 Running test suite..."
 python3 test_student_program.py
+
+# Check test results and display appropriate message
 if [ $? -eq 0 ]; then
-  echo "✅ 모든 테스트 성공!"
+  echo "✅ All tests passed successfully!"
 else
-  echo "❌ 테스트 실패! 코드를 다시 확인하세요."
+  echo "❌ Tests failed! Please review your code."
 fi
 echo "=============================="
